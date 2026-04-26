@@ -1,0 +1,38 @@
+name: Sync mirrored releases
+
+on:
+  push:
+    branches:
+      - main
+  schedule:
+    - cron: "17 6 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: sync-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: astral-sh/setup-uv@v5
+        with:
+          version: latest
+
+      - name: Configure git identity
+        run: |
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Sync upstream releases
+        run: uv run --script sync.py
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

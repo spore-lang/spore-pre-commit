@@ -1,0 +1,17 @@
+- id: spore-format
+  name: spore format
+  description: Format Spore source files with `spore format`.
+  entry: spore format
+  language: python
+  files: \.sp$
+  require_serial: true
+  additional_dependencies: []
+
+- id: spore-check
+  name: spore check
+  description: Type-check Spore source files with `spore check`.
+  entry: spore check
+  language: python
+  files: \.sp$
+  require_serial: true
+  additional_dependencies: []
