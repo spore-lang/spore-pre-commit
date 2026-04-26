@@ -64,7 +64,7 @@ def main() -> None:
             continue
 
         git(["add", *changed_paths])
-        git(["commit", "-m", f"chore: mirror {PACKAGE_NAME} {tag_name}"])
+        git(["commit", "-m", f"🔄 chore: mirror {PACKAGE_NAME} {tag_name}"])
         publish_tag_and_release(tag_name, version, push_head=True, latest=index == len(versions) - 1)
 
 

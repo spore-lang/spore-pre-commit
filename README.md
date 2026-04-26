@@ -36,4 +36,4 @@ automatically creates the matching mirror tag if it is not present yet.
 - Hook metadata lives in `spore/.pre-commit-hooks.yaml`.
 - Release discovery comes from `https://pypi.org/pypi/spore-lang/json`.
 - Mirror tags are cut only for stable upstream releases.
-- Automated update commits use `chore: mirror spore-lang vX.Y.Z`.
+- Automated update commits use `🔄 chore: mirror spore-lang vX.Y.Z`.
