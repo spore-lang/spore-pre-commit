@@ -23,7 +23,7 @@ release.
 ```yaml
 repos:
   - repo: https://github.com/spore-lang/spore-pre-commit
-    rev: v0.0.2
+    rev: v0.0.3
     hooks:
       - id: spore-format
       - id: spore-check

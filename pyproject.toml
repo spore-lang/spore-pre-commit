@@ -4,13 +4,13 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "spore-pre-commit"
-version = "0.0.2"
+version = "0.0.3"
 description = "Pre-commit mirror for spore-lang."
 readme = "README.md"
 requires-python = ">=3.8"
 license = { text = "MIT OR Apache-2.0" }
 authors = [{ name = "Spore contributors" }]
-dependencies = ["spore-lang==0.0.2"]
+dependencies = ["spore-lang==0.0.3"]
 classifiers = [
   "Development Status :: 3 - Alpha",
   "Intended Audience :: Developers",
