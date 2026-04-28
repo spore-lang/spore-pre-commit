@@ -16,6 +16,8 @@ import tomllib
 from packaging.requirements import Requirement
 from packaging.version import Version
 
+from check_invariants import validate_repo_state
+
 ROOT = Path(__file__).resolve().parent
 PYPROJECT = ROOT / "pyproject.toml"
 README = ROOT / "README.md"
@@ -37,6 +39,7 @@ BOOTSTRAP_VERSION = Version("0.0.0")
 
 def main() -> None:
     current_version = read_current_version()
+    validate_repo_state()
     maybe_publish_current_tag(current_version)
     versions = find_new_versions(current_version)
     if not versions:
@@ -63,11 +66,18 @@ def read_current_version() -> Version:
     with PYPROJECT.open("rb") as handle:
         pyproject = tomllib.load(handle)
 
+    project_version = Version(pyproject["project"]["version"])
     requirement = Requirement(pyproject["project"]["dependencies"][0])
     specifier = next(iter(requirement.specifier), None)
     if specifier is None or specifier.operator != "==":
         raise RuntimeError(f"Expected an exact {PACKAGE_NAME} pin in pyproject.toml.")
-    return Version(specifier.version)
+    dependency_version = Version(specifier.version)
+    if project_version != dependency_version:
+        raise RuntimeError(
+            "pyproject.toml version and dependency pin must match "
+            f"({project_version} != {dependency_version})."
+        )
+    return dependency_version
 
 
 def find_new_versions(current_version: Version) -> list[Version]:
