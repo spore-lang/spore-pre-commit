@@ -18,23 +18,15 @@ from packaging.version import Version
 
 ROOT = Path(__file__).resolve().parent
 PYPROJECT = ROOT / "pyproject.toml"
-HOOKS = ROOT / ".pre-commit-hooks.yaml"
 README = ROOT / "README.md"
 
 PACKAGE_NAME = os.environ.get("SPORE_PACKAGE_NAME", "spore-lang")
-UPSTREAM_OWNER = os.environ.get("SPORE_UPSTREAM_OWNER", "spore-lang")
-UPSTREAM_REPO = os.environ.get("SPORE_UPSTREAM_REPO", "spore")
 TARGET_BRANCH = os.environ.get("TARGET_BRANCH", "main")
 REMOTE_NAME = os.environ.get("TARGET_REMOTE", "origin")
 PYPI_JSON_URL = os.environ.get(
     "SPORE_PYPI_JSON_URL",
     f"https://pypi.org/pypi/{PACKAGE_NAME}/json",
 )
-HOOKS_URL_TEMPLATE = os.environ.get(
-    "SPORE_HOOKS_URL_TEMPLATE",
-    f"https://raw.githubusercontent.com/{UPSTREAM_OWNER}/{UPSTREAM_REPO}/{{ref}}/.pre-commit-hooks.yaml",
-)
-HOOKS_FALLBACK_REF = os.environ.get("SPORE_HOOKS_FALLBACK_REF", "main")
 MIRROR_SOURCE_URL_TEMPLATE = os.environ.get(
     "SPORE_MIRROR_SOURCE_URL_TEMPLATE",
     f"https://pypi.org/project/{PACKAGE_NAME}/{{version}}/",
@@ -57,8 +49,7 @@ def main() -> None:
             print(f"Skipping existing tag {tag_name}.")
             continue
 
-        hooks_content = fetch_hooks(version)
-        changed_paths = update_files(version, hooks_content)
+        changed_paths = update_files(version)
         if not changed_paths:
             print(f"No file changes for {tag_name}; skipping.")
             continue
@@ -97,7 +88,7 @@ def find_new_versions(current_version: Version) -> list[Version]:
     return sorted(versions)
 
 
-def update_files(version: Version, hooks_content: str) -> tuple[str, ...]:
+def update_files(version: Version) -> tuple[str, ...]:
     changed_paths: list[str] = []
 
     pyproject_before = PYPROJECT.read_text()
@@ -126,35 +117,7 @@ def update_files(version: Version, hooks_content: str) -> tuple[str, ...]:
         README.write_text(readme_after)
         changed_paths.append(README.name)
 
-    hooks_before = HOOKS.read_text()
-    hooks_after = hooks_content.rstrip() + "\n"
-    if hooks_after != hooks_before:
-        HOOKS.write_text(hooks_after)
-        changed_paths.append(HOOKS.name)
-
     return tuple(changed_paths)
-
-
-def fetch_hooks(version: Version) -> str:
-    tag_name = f"v{version}"
-    refs = [tag_name]
-    if HOOKS_FALLBACK_REF and HOOKS_FALLBACK_REF not in refs:
-        refs.append(HOOKS_FALLBACK_REF)
-
-    last_error: HTTPError | None = None
-    for ref in refs:
-        try:
-            if ref != tag_name:
-                print(f"Falling back to hooks from {ref}.")
-            return fetch_text(HOOKS_URL_TEMPLATE.format(ref=ref, tag=tag_name, version=version))
-        except HTTPError as error:
-            if error.code != 404:
-                raise
-            last_error = error
-
-    raise RuntimeError(
-        f"Unable to fetch .pre-commit-hooks.yaml for {tag_name} from upstream"
-    ) from last_error
 
 
 def replace_exact(
