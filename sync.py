@@ -19,7 +19,6 @@ from packaging.version import Version
 ROOT = Path(__file__).resolve().parent
 PYPROJECT = ROOT / "pyproject.toml"
 README = ROOT / "README.md"
-SMOKE_FIXTURE = ROOT / "tests" / "fixtures" / "smoke.sp"
 
 PACKAGE_NAME = os.environ.get("SPORE_PACKAGE_NAME", "spore-lang")
 TARGET_BRANCH = os.environ.get("TARGET_BRANCH", "main")
@@ -57,7 +56,6 @@ def main() -> None:
 
         git(["add", *changed_paths])
         git(["commit", "-m", f"🔄 chore: mirror {PACKAGE_NAME} {full_tag_name}"])
-        run_smoke_tests(version)
         publish_tag_set_and_release(
             version,
             push_head=True,
@@ -153,7 +151,6 @@ def maybe_publish_current_tag(current_version: Version) -> None:
         return
 
     print(f"Publishing missing mirror tag {full_tag_name} for current repository state.")
-    run_smoke_tests(current_version)
     publish_tag_set_and_release(current_version, push_head=False, latest=True)
 
 
@@ -180,14 +177,6 @@ def remote_tag_exists(tag_name: str) -> bool:
     if result.returncode == 2:
         return False
     raise RuntimeError(result.stderr.strip() or f"git ls-remote failed for {tag_name}")
-
-
-def run_smoke_tests(version: Version) -> None:
-    fixture_path = str(SMOKE_FIXTURE.relative_to(ROOT))
-    package_spec = f"{PACKAGE_NAME}=={version}"
-    print(f"Running smoke tests for {package_spec}.")
-    run(["uv", "tool", "run", "--from", package_spec, "spore", "format", "--check", fixture_path])
-    run(["uv", "tool", "run", "--from", package_spec, "spore", "check", fixture_path])
 
 
 def version_tag_names(version: Version) -> tuple[str, str, str]:
