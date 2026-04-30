@@ -18,9 +18,6 @@ references in this repository, creates the corresponding mirror commit, pushes
 tag `vX.Y.Z`, and opens a GitHub release that points back to the mirrored PyPI
 release.
 
-Pull requests run a metadata invariant check plus a smoke install so version
-drift is caught before release automation runs.
-
 ## Usage
 
 ```yaml
