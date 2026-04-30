@@ -14,9 +14,10 @@ release:
 `sync.py` is the only automation entrypoint. The GitHub Actions workflow runs it
 on pushes to `main`, on a schedule, and on demand. When a new stable
 `spore-lang` release appears on PyPI, the script only updates tracked version
-references in this repository, creates the corresponding mirror commit, pushes
-tag `vX.Y.Z`, and opens a GitHub release that points back to the mirrored PyPI
-release.
+references in this repository, creates the corresponding mirror commit, runs
+smoke tests against a checked-in standalone fixture, refreshes alias tags
+`vX` and `vX.Y`, pushes immutable tag `vX.Y.Z`, and opens a GitHub release that
+points back to the mirrored PyPI release.
 
 ## Usage
 
@@ -39,4 +40,8 @@ automatically creates the matching mirror tag if it is not present yet.
 - Automated sync only bumps this repository's version references; it does not
   rewrite hooks automatically.
 - Mirror tags are cut only for stable upstream releases.
+- Smoke tests run before tags are pushed, using `spore format --check` and
+  `spore check` on `tests/fixtures/smoke.sp`.
+- Moving alias tags `vX` and `vX.Y` are refreshed to the latest mirrored patch
+  release after smoke tests pass.
 - Automated update commits use `🔄 chore: mirror spore-lang vX.Y.Z`.
