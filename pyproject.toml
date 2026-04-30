@@ -8,13 +8,12 @@ version = "0.0.3"
 description = "Pre-commit mirror for spore-lang."
 readme = "README.md"
 requires-python = ">=3.8"
-license = { text = "MIT OR Apache-2.0" }
+license = { text = "MIT" }
 authors = [{ name = "Spore contributors" }]
 dependencies = ["spore-lang==0.0.3"]
 classifiers = [
   "Development Status :: 3 - Alpha",
   "Intended Audience :: Developers",
-  "License :: OSI Approved :: Apache Software License",
   "License :: OSI Approved :: MIT License",
   "Programming Language :: Python",
   "Programming Language :: Python :: 3",

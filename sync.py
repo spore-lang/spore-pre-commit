@@ -44,19 +44,23 @@ def main() -> None:
         return
 
     for index, version in enumerate(versions):
-        tag_name = f"v{version}"
-        if remote_tag_exists(tag_name):
-            print(f"Skipping existing tag {tag_name}.")
+        full_tag_name = version_tag_names(version)[-1]
+        if remote_tag_exists(full_tag_name):
+            print(f"Skipping existing tag {full_tag_name}.")
             continue
 
         changed_paths = update_files(version)
         if not changed_paths:
-            print(f"No file changes for {tag_name}; skipping.")
+            print(f"No file changes for {full_tag_name}; skipping.")
             continue
 
         git(["add", *changed_paths])
-        git(["commit", "-m", f"🔄 chore: mirror {PACKAGE_NAME} {tag_name}"])
-        publish_tag_and_release(tag_name, version, push_head=True, latest=index == len(versions) - 1)
+        git(["commit", "-m", f"🔄 chore: mirror {PACKAGE_NAME} {full_tag_name}"])
+        publish_tag_set_and_release(
+            version,
+            push_head=True,
+            latest=index == len(versions) - 1,
+        )
 
 
 def read_current_version() -> Version:
@@ -142,12 +146,12 @@ def maybe_publish_current_tag(current_version: Version) -> None:
         print(f"Skipping current-tag bootstrap because remote {REMOTE_NAME!r} is not configured.")
         return
 
-    tag_name = f"v{current_version}"
-    if remote_tag_exists(tag_name):
+    full_tag_name = version_tag_names(current_version)[-1]
+    if remote_tag_exists(full_tag_name):
         return
 
-    print(f"Publishing missing mirror tag {tag_name} for current repository state.")
-    publish_tag_and_release(tag_name, current_version, push_head=False, latest=True)
+    print(f"Publishing missing mirror tag {full_tag_name} for current repository state.")
+    publish_tag_set_and_release(current_version, push_head=False, latest=True)
 
 
 def remote_tag_exists(tag_name: str) -> bool:
@@ -175,26 +179,48 @@ def remote_tag_exists(tag_name: str) -> bool:
     raise RuntimeError(result.stderr.strip() or f"git ls-remote failed for {tag_name}")
 
 
-def publish_tag_and_release(
-    tag_name: str,
+def version_tag_names(version: Version) -> tuple[str, str, str]:
+    if len(version.release) != 3:
+        raise RuntimeError(f"Expected a three-part release version, got {version}.")
+
+    major, minor, patch = version.release
+    return (
+        f"v{major}",
+        f"v{major}.{minor}",
+        f"v{major}.{minor}.{patch}",
+    )
+
+
+def publish_tag_set_and_release(
     version: Version,
     *,
     push_head: bool,
     latest: bool,
 ) -> None:
-    git(["tag", tag_name])
+    major_tag, minor_tag, full_tag = version_tag_names(version)
+    git(["tag", "-f", major_tag])
+    git(["tag", "-f", minor_tag])
+    git(["tag", full_tag])
+
+    push_args = ["push", REMOTE_NAME]
     if push_head:
-        git(["push", REMOTE_NAME, f"HEAD:refs/heads/{TARGET_BRANCH}", "--tags"])
-    else:
-        git(["push", REMOTE_NAME, "--tags"])
+        push_args.append(f"HEAD:refs/heads/{TARGET_BRANCH}")
+    push_args.extend(
+        [
+            f"+refs/tags/{major_tag}:refs/tags/{major_tag}",
+            f"+refs/tags/{minor_tag}:refs/tags/{minor_tag}",
+            f"refs/tags/{full_tag}:refs/tags/{full_tag}",
+        ]
+    )
+    git(push_args)
 
     release_cmd = [
         "gh",
         "release",
         "create",
-        tag_name,
+        full_tag,
         "--title",
-        tag_name,
+        full_tag,
         "--notes",
         f"Mirrors {PACKAGE_NAME} {version}: {MIRROR_SOURCE_URL_TEMPLATE.format(version=version)}",
         "--verify-tag",
