@@ -39,7 +39,7 @@ hooks = [
   {
     id = "validate-pre-commit-manifest",
     name = "validate-pre-commit-manifest",
-    entry = "uvx prek validate-manifest .pre-commit-hooks.yaml",
+    entry = "prek validate-manifest .pre-commit-hooks.yaml",
     language = "system",
     files = "^\\.pre-commit-hooks\\.yaml$",
     pass_filenames = false,
