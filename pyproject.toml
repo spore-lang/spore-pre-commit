@@ -4,7 +4,7 @@ version = "0.0.3"
 description = "Pre-commit mirror for spore-lang."
 readme = "README.md"
 requires-python = ">=3.8"
-license = "MIT"
+license = { text = "MIT" }
 authors = [{ name = "Spore contributors" }]
 classifiers = [
   "Development Status :: 3 - Alpha",
@@ -20,7 +20,7 @@ Homepage = "https://github.com/spore-lang/spore-pre-commit"
 Repository = "https://github.com/spore-lang/spore-pre-commit"
 
 [build-system]
-requires = ["setuptools>=77", "wheel"]
+requires = ["setuptools>=70", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools]
