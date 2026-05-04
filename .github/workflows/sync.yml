@@ -26,6 +26,7 @@ jobs:
       - uses: astral-sh/setup-uv@v5
         with:
           version: latest
+          python-version: "3.13"
 
       - name: Configure git identity
         run: |
@@ -33,6 +34,6 @@ jobs:
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
       - name: Sync upstream releases
-        run: uv run --script sync.py
+        run: uv run --python 3.13 --script sync.py
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

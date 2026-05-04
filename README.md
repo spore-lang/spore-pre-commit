@@ -32,6 +32,9 @@ repos:
 `main` starts at the current published `spore-lang` version. The sync workflow
 automatically creates the matching mirror tag if it is not present yet.
 
+Hook environments follow the mirrored `spore-lang` package's Python
+requirement. The current mirror requires Python 3.13 or newer.
+
 ## Source of truth
 
 - Hook metadata lives in this repository's `.pre-commit-hooks.yaml`.
