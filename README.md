@@ -1,10 +1,10 @@
 # spore-pre-commit
 
-`spore-pre-commit` is a tiny mirror repository for running `spore-lang` through
-[`pre-commit`](https://pre-commit.com/).
+`spore-pre-commit` is a tiny mirror repository for running published
+`spore-lang` releases through [`pre-commit`](https://pre-commit.com/).
 
 The repository keeps one version-aligned snapshot per upstream `spore-lang`
-release:
+PyPI release:
 
 1. `.pre-commit-hooks.yaml` is maintained in this repository and only changes
    when the hook surface itself changes.
@@ -32,13 +32,18 @@ repos:
 `main` starts at the current published `spore-lang` version. The sync workflow
 automatically creates the matching mirror tag if it is not present yet.
 
+Mirror tags only move when a stable PyPI release exists. If a downstream repo
+needs unreleased `spore` main-branch syntax, keep using a source-built CLI
+until the next public package is published.
+
 Hook environments follow the mirrored `spore-lang` package's Python
 requirement. The current mirror requires Python 3.13 or newer.
 
 ## Source of truth
 
 - Hook metadata lives in this repository's `.pre-commit-hooks.yaml`.
-- Release discovery comes from `https://pypi.org/pypi/spore-lang/json`.
+- Release discovery comes from `https://pypi.org/pypi/spore-lang/json`, not
+  from GitHub tags in the `spore` repo.
 - Automated sync only bumps this repository's version references; it does not
   rewrite hooks automatically.
 - Mirror tags are cut only for stable upstream releases.
