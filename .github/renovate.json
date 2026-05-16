@@ -2,20 +2,5 @@
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
     "github>zrr1999/renovate-config"
-  ],
-  "packageRules": [
-    {
-      "description": "Keep .python-version on 3.13 until upstream supports 3.14",
-      "matchManagers": ["pyenv"],
-      "matchPackageNames": ["python"],
-      "allowedVersions": "/^3\\.13(?:\\.\\d+)?$/"
-    },
-    {
-      "description": "Keep setup-python on 3.13 until upstream supports 3.14",
-      "matchManagers": ["github-actions"],
-      "matchDepTypes": ["uses-with"],
-      "matchPackageNames": ["python"],
-      "allowedVersions": "/^3\\.13(?:\\.\\d+)?$/"
-    }
   ]
 }
